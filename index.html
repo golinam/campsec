@@ -7242,21 +7242,11 @@ window.pwaInstall=function(){
   var isAndroid=/Android/.test(ua);
   var msg;
   if(isIOS){
-    msg="הוספה לשולחן העבודה — iPhone/iPad:
-
-1. לחץ ◻️↑ (Share) בתחתית Safari
-2. גלול מטה ובחר «הוסף למסך הבית»
-3. לחץ «הוסף»";
+    msg="iPhone/iPad:\n1. לחץ ◻️↑ (Share)\n2. הוסף למסך הבית\n3. לחץ הוסף";
   } else if(isAndroid){
-    msg="הוספה לשולחן העבודה — Android:
-
-1. פתח את התפריט ⋮ של Chrome
-2. בחר «הוסף לדף הבית» או «התקן אפליקציה»
-3. אשר";
+    msg="Android:\n1. תפריט ⋮ של Chrome\n2. הוסף לדף הבית\n3. אשר";
   } else {
-    msg="הוספה לשולחן העבודה:
-
-בדפדפן — לחץ על תפריט ⋮ ← «התקן אפליקציה» / «הוסף לדף הבית»";
+    msg="תפריט הדפדפן ← התקן אפליקציה";
   }
   alert(msg);
 };
