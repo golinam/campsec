@@ -819,7 +819,8 @@
 @media (max-width:768px){
   /* float-card → מסך מלא */
   /* float-card → מסך מלא ב-mobile */
-  .float-card{
+  /* float-card: רק כשפתוח — מסך מלא */
+  .float-card:not(.hidden){
     position:fixed !important;
     top:0 !important;
     left:0 !important;
@@ -834,8 +835,6 @@
     overflow:hidden !important;
     z-index:9999 !important;
     margin:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
   }
   .fw-head{
     padding:10px 14px !important;
