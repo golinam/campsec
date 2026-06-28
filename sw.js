@@ -1,33 +1,52 @@
-// campusec service worker — minimal, enables installable PWA + offline shell
-const CACHE = "campusec-v1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+// campusec Service Worker — v28-06-2026
+// עדכון גרסה מאפס את כל ה-cache הישן
 
-self.addEventListener("install", (e) => {
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS).catch(() => {})));
+const CACHE_NAME = 'campusec-v28062026';
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
+];
+
+// התקנה — מחק cache ישן, שמור חדש
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => caches.delete(key)))
+    ).then(() =>
+      caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    ).then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+// הפעלה — קח שליטה מיידית
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
 
-// Network-first for navigation (always get fresh app), cache fallback when offline.
-self.addEventListener("fetch", (e) => {
-  const req = e.request;
-  if (req.method !== "GET") return;
-  if (req.mode === "navigate") {
-    e.respondWith(
-      fetch(req).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put("./index.html", copy)).catch(() => {});
-        return res;
-      }).catch(() => caches.match("./index.html"))
-    );
+// בקשות — network first, cache fallback
+self.addEventListener('fetch', event => {
+  // אל תחסום בקשות Firebase
+  if (event.request.url.includes('firebase') ||
+      event.request.url.includes('googleapis') ||
+      event.request.url.includes('gstatic')) {
     return;
   }
-  e.respondWith(caches.match(req).then((hit) => hit || fetch(req)));
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
 });
