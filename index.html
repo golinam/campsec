@@ -3938,7 +3938,10 @@ setTimeout(initChatDrag, 800);
 
 // ---- generic drag: makes `win` draggable by grabbing `handle` (ignoring clicks on `ignoreSel`) ----
 function makeDraggable(win, handle, ignoreSel){
-  if(!win||!handle||handle.dataset.dragInit)return; handle.dataset.dragInit="1";
+  if(!win||!handle||handle.dataset.dragInit)return;
+  // מובייל — אין גרירה, חלון נשאר במיקום CSS
+  if(window.innerWidth<=900)return;
+  handle.dataset.dragInit="1";
   let dragging=false, sx=0, sy=0, ox=0, oy=0;
   const start=(e)=>{ if(ignoreSel&&e.target.closest(ignoreSel))return; if(e.target.closest("button,input,select,textarea,a"))return;
     dragging=true; const p=e.touches?e.touches[0]:e; sx=p.clientX; sy=p.clientY; const r=win.getBoundingClientRect(); ox=r.left; oy=r.top;
@@ -3948,7 +3951,6 @@ function makeDraggable(win, handle, ignoreSel){
     win.style.left=nx+"px"; win.style.top=ny+"px"; win.style.right="auto"; win.style.bottom="auto"; win.style.transform="none"; };
   const end=()=>{ dragging=false; document.body.style.userSelect=""; };
   handle.addEventListener("mousedown",start); document.addEventListener("mousemove",move); document.addEventListener("mouseup",end);
-  handle.addEventListener("touchstart",start,{passive:true}); document.addEventListener("touchmove",move,{passive:true}); document.addEventListener("touchend",end);
 }
 let _floatZ=4000;
 function bringToFront(win){ _floatZ++; win.style.zIndex=_floatZ; }
@@ -3956,28 +3958,6 @@ function bringToFront(win){ _floatZ++; win.style.zIndex=_floatZ; }
 function makeFloatingWindow(winEl, handleEl){
   if(!winEl) return;
   winEl.classList.add("floating-win");
-  // ── מובייל: מסך מלא, ללא גרירה ─────────────────────────────
-  if(window.innerWidth<=768||('ontouchstart' in window && window.innerWidth<1024)){
-    winEl.style.cssText="";
-    winEl.style.position="fixed";
-    winEl.style.top="0";
-    winEl.style.left="0";
-    winEl.style.right="0";
-    winEl.style.bottom="0";
-    winEl.style.width="100%";
-    winEl.style.maxWidth="100%";
-    winEl.style.height="100%";
-    winEl.style.maxHeight="100%";
-    winEl.style.borderRadius="0";
-    winEl.style.transform="none";
-    winEl.style.zIndex="9999";
-    winEl.style.margin="0";
-    winEl.style.display="flex";
-    winEl.style.flexDirection="column";
-    winEl.style.overflow="hidden";
-    return;
-  }
-  // ── דסקטופ: גרירה רגילה ──────────────────────────────────
   bringToFront(winEl);
   if(handleEl) makeDraggable(winEl, handleEl, ".fw-btn,.x");
   winEl.addEventListener("mousedown",()=>bringToFront(winEl));
@@ -7333,23 +7313,9 @@ window.pwaInstall=function(){
   var isIOS=/iPhone|iPad|iPod/.test(ua);
   var isAndroid=/Android/.test(ua);
   var msg;
-  if(isIOS){
-    msg="הוספה לשולחן העבודה — iPhone/iPad:
-
-1. לחץ ◻️↑ (Share) בתחתית Safari
-2. גלול מטה ובחר «הוסף למסך הבית»
-3. לחץ «הוסף»";
-  } else if(isAndroid){
-    msg="הוספה לשולחן העבודה — Android:
-
-1. פתח את התפריט ⋮ של Chrome
-2. בחר «הוסף לדף הבית» או «התקן אפליקציה»
-3. אשר";
-  } else {
-    msg="הוספה לשולחן העבודה:
-
-בדפדפן — לחץ על תפריט ⋮ ← «התקן אפליקציה» / «הוסף לדף הבית»";
-  }
+  if(isIOS){ msg="iPhone: לחץ Share ◻️↑ ← הוסף למסך הבית ← הוסף"; }
+  else if(isAndroid){ msg="Android: תפריט Chrome ⋮ ← הוסף לדף הבית"; }
+  else { msg="תפריט הדפדפן ← התקן אפליקציה"; }
   alert(msg);
 };
 // הצג כפתור 📲 תמיד — ההוראות שימושיות לכולם
