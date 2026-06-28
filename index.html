@@ -774,7 +774,7 @@
   .fw-head:active{cursor:grabbing}
   .fw-head h3{margin:0;font-size:16px;color:#fff}
   .fw-head .x{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:8px;font-size:18px;cursor:pointer}
-  .fw-body{padding:18px;overflow-y:auto;flex:1}
+  .fw-body{padding:18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
   .ch-title{display:flex;align-items:center;gap:7px;font-weight:800;font-size:14px}
   .ch-actions{display:flex;gap:4px}
   .ch-btn{width:28px;height:28px;border:none;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:.15s}
@@ -3956,6 +3956,28 @@ function bringToFront(win){ _floatZ++; win.style.zIndex=_floatZ; }
 function makeFloatingWindow(winEl, handleEl){
   if(!winEl) return;
   winEl.classList.add("floating-win");
+  // ── מובייל: מסך מלא, ללא גרירה ─────────────────────────────
+  if(window.innerWidth<=768||('ontouchstart' in window && window.innerWidth<1024)){
+    winEl.style.cssText="";
+    winEl.style.position="fixed";
+    winEl.style.top="0";
+    winEl.style.left="0";
+    winEl.style.right="0";
+    winEl.style.bottom="0";
+    winEl.style.width="100%";
+    winEl.style.maxWidth="100%";
+    winEl.style.height="100%";
+    winEl.style.maxHeight="100%";
+    winEl.style.borderRadius="0";
+    winEl.style.transform="none";
+    winEl.style.zIndex="9999";
+    winEl.style.margin="0";
+    winEl.style.display="flex";
+    winEl.style.flexDirection="column";
+    winEl.style.overflow="hidden";
+    return;
+  }
+  // ── דסקטופ: גרירה רגילה ──────────────────────────────────
   bringToFront(winEl);
   if(handleEl) makeDraggable(winEl, handleEl, ".fw-btn,.x");
   winEl.addEventListener("mousedown",()=>bringToFront(winEl));
@@ -6173,7 +6195,7 @@ window.openSiteDetail=async(siteId)=>{
   makeFloatingWindow(win, document.getElementById("siteDetailHead"));
   renderSiteDetail();
 };
-window.closeSiteDetail=()=>{ document.getElementById("siteDetailWin").classList.add("hidden"); siteDetailId=null; };
+window.closeSiteDetail=()=>{ var w=document.getElementById("siteDetailWin"); w.classList.add("hidden"); w.style.cssText=""; siteDetailId=null; };
 window.siteDetailSwitch=(tab)=>{ siteDetailTab=tab; renderSiteDetail(); };
 function siteById(id){ return (SITES||[]).find(s=>s.id===id); }
 async function renderSiteDetail(){
