@@ -2011,6 +2011,7 @@ import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, colle
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject, listAll, getMetadata }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+console.log("%c campusec v2026-06-28-FIXED ","background:#2563eb;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold");
 const firebaseConfig = {
   apiKey: "AIzaSyDJ4ESajJHJoeYXbpgfXbJj9CApt__NlCY",
   authDomain: "campusbit-7af0e.firebaseapp.com",
@@ -6349,7 +6350,7 @@ function renderTable(){
     </tr>`;}).join("");
   renderArchive();
 }
-window.renderTable=renderTable;;
+window.renderTable=renderTable;
 window.renderArchive=()=>{
   const wrap=document.getElementById("archiveWrap"); if(!wrap)return;
   const arch=guards.filter(g=>(g.status||"active")!=="active").sort((a,b)=>(a.num||0)-(b.num||0));
