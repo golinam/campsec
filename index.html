@@ -2799,7 +2799,7 @@ function renderSiteSwitcher(){
 window.switchSite=(id)=>{
   if(!id)return;
   activeSite=id; window.activeSite=id;
-  loadStaffTargets().then(()=>subscribeGuards());
+  loadStaffTargets().then(()=>setTimeout(function(){subscribeGuards();},0));
   if(document.getElementById("sched") && !document.getElementById("sched").classList.contains("hidden")) loadSchedule();
 };
 async function loadStaffTargets(){
@@ -6315,7 +6315,7 @@ window.toggleGapsFilter=()=>{
   b.style.color=gapsFilter?"#3a2800":"";
   renderTable();
 };
-window.renderTable=()=>{
+function renderTable(){
   const q=(document.getElementById("search").value||"").trim();
   const fc=document.getElementById("fClass").value, fs=document.getElementById("fStatus").value;
   const fr=document.getElementById("fRole").value;
@@ -6348,7 +6348,8 @@ window.renderTable=()=>{
       <td>${gapCell}</td>
     </tr>`;}).join("");
   renderArchive();
-};
+}
+window.renderTable=renderTable;;
 window.renderArchive=()=>{
   const wrap=document.getElementById("archiveWrap"); if(!wrap)return;
   const arch=guards.filter(g=>(g.status||"active")!=="active").sort((a,b)=>(a.num||0)-(b.num||0));

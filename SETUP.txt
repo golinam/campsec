@@ -1,0 +1,89 @@
+SecForce — ניהול צוות אבטחה — מדריך הקמה לאתר עובד
+===================================================
+
+האפליקציה כבר מותאמת למבנה הטבלה שלך, ו-21 המאבטחים הקיימים מובנים בתוכה
+ומוכנים לייבוא בלחיצה אחת.
+
+═══════════════════════════════════════════════
+5 שלבים עד אתר עובד
+═══════════════════════════════════════════════
+
+שלב 1 — חיבור הפרויקט (5 דק')
+א. Firebase Console > הפרויקט שלך > Project settings.
+ב. תחת "Your apps" — אם אין אפליקציית Web, הוסף אחת (אייקון </>).
+ג. העתק את אובייקט firebaseConfig.
+ד. ב-index.html, החלף את ה-placeholder המסומן בערכים שלך.
+
+שלב 2 — התחברות Google (2 דק')
+Authentication > Sign-in method > Google > Enable > Save.
+Authentication > Settings > Authorized domains — ודא שהדומיין שלך רשום.
+
+שלב 3 — Firestore + כללי אבטחה (5 דק') ← הכי חשוב
+Build > Firestore Database > Create database > Production mode.
+לשונית Rules > החלף הכל בכללים למטה > Publish.
+זה מה שמבטיח שרק golangan@gmail.com מאשר ומוחק.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'golangan@gmail.com';
+    }
+    function isApproved() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+    match /users/{uid} {
+      allow read:   if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if isAdmin();
+    }
+    match /guards/{id} {
+      allow read:           if isApproved() || isAdmin();
+      allow create, update: if isApproved() || isAdmin();
+      allow delete:         if isAdmin();
+    }
+  }
+}
+
+שלב 4 — העלאת האתר (10 דק')
+מומלץ Firebase Hosting (חינם, HTTPS):
+  npm install -g firebase-tools
+  firebase login
+  firebase init hosting   (בחר הפרויקט; public directory: .;  SPA: No)
+  firebase deploy
+תקבל כתובת כמו https://your-project.web.app
+בדיקה מקומית: python3 -m http.server 8000  (חובה שרת, לא קליק כפול — בגלל popup של גוגל)
+
+שלב 5 — כניסה ראשונה וייבוא (1 דק')
+א. התחבר עם golangan@gmail.com — תאושר אוטומטית כמנהל.
+ב. "רשימת מאבטחים" > "ייבוא נתונים ראשוני (21)" — פעם אחת בלבד.
+ג. מעכשיו הכל מסונכרן בענן.
+
+═══════════════════════════════════════════════
+הרשאות
+═══════════════════════════════════════════════
+- כל עובד שיתחבר נכנס כ"ממתין לאישור" ולא רואה נתונים.
+- רק golangan@gmail.com מאשר/דוחה/מוחק.
+- השבתת מאבטח = שינוי סטטוס ל"מושבת" בכרטיס (לא מחיקה).
+
+═══════════════════════════════════════════════
+מה הותאם מהטבלה שלך
+═══════════════════════════════════════════════
+שדות שיובאו: מספר, שם, ת.ז, טלפון, כתובת, רובאי, תאריך תחילת עבודה, תפקיד,
+סיווג, נשלח ל-3, רענון, מועד רישיון, רישיון בתוקף, תוקף הרשאה,
+סוג הכשרה (9 שעות/רמה א), חמוש, רענון הכשרה, בטיחות בסיסי, עבודה בגובה.
+התאריכים נורמלו לפורמט אחיד.
+דשבורד אוטומטי: סיווגים (3=11, 6=9, 2=1), תפקידים, הכשרות, חמושים,
+ורישיונות שפגו/קרובים לפוג (התראה 60 יום מראש).
+מידות ביגוד לא היו בטבלה — השדות מוכנים למילוי ידני בכרטיס.
+
+═══════════════════════════════════════════════
+שדרוגים עתידיים לשיווק
+═══════════════════════════════════════════════
+- ריבוי-ארגונים: כל חברה רואה רק את הצוות שלה.
+- התראות מייל/וואטסאפ לפני פקיעת רישיון.
+- ייצוא לאקסל/PDF.
+- לוג פעולות (כבר נשמר חלקית בשדה updatedBy).
+- שיבוץ משמרות ואתרים.
