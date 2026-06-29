@@ -7536,7 +7536,7 @@ async function lastSavedSchedule(beforeWeek){
   }catch(e){}
   return null;
 }
-window.loadSchedule=async()=>{
+async function loadSchedule(){
   const start=document.getElementById("weekStart").value;
   if(!start)return;
   weekKey=start;
@@ -7568,7 +7568,8 @@ window.loadSchedule=async()=>{
   renderSchedule();
   renderConstraints();
   updatePublishUI();
-};
+}
+window.loadSchedule=loadSchedule;;
 function guardDatalist(){
   return '<datalist id="guardNames">'+
     guards.filter(g=>g.status==="active").map(g=>`<option value="${(g.name||'').replace(/"/g,'&quot;')}">`).join("")+
