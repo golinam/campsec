@@ -2733,12 +2733,15 @@ onAuthStateChanged(auth, async (user)=>{
   applyTabPerms();
   renderSiteSwitcher();
   await loadStaffTargets();
-  show("app"); subscribeGuards();
-  loadTasks();
-  startPresence();
-  if(isAdmin){ subscribeRequests(); subscribeChanges(); }
-  else if(isManager()){ subscribeChanges(); document.getElementById("changesBtn").classList.remove("hidden"); }
-  initWeek();
+  show("app");
+  setTimeout(function(){
+    subscribeGuards();
+    loadTasks();
+    startPresence();
+    if(isAdmin){ subscribeRequests(); subscribeChanges(); }
+    else if(isManager()){ subscribeChanges(); document.getElementById("changesBtn").classList.remove("hidden"); }
+    initWeek();
+  },0);
 });
 }
 // user-assignable tabs (admin-only tabs excluded)
