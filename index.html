@@ -927,8 +927,13 @@
       if(login) login.classList.add('hidden');
       if(cn)    cn.classList.remove('hidden');
     });
+  } else {
+    // Admin mode — הצג login מיד (לא מחכים ל-Firebase)
+    document.addEventListener('DOMContentLoaded', function(){
+      var login = document.getElementById('login');
+      if(login) login.classList.remove('hidden');
+    });
   }
-  // Admin mode: module will call show("login") when ready
 })();
 </script>
 <svg width="0" height="0" style="position:absolute"><defs>
